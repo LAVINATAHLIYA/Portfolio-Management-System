@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Portfolio Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-blue: #0077b6;
+            --dark-blue: #005f8a;
+            --light-blue: #e6f0ff;
+        }
+        body {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f0ff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .register-card {
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 119, 182, 0.15);
+            overflow: hidden;
+            margin: 2rem auto;
+        }
+        .card-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .card-body {
+            padding: 2rem;
+        }
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(0, 119, 182, 0.25);
+        }
+        .btn-primary {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            padding: 0.5rem;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: var(--dark-blue);
+            border-color: var(--dark-blue);
+        }
+        .password-strength {
+            height: 5px;
+            background-color: #e9ecef;
+            margin-top: 5px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .flashes {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .nav-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        .input-icon {
+            position: relative;
+        }
+        .input-icon i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('home') }}" class="btn btn-outline-primary nav-back">
+        <i class="bi bi-arrow-left"></i> Back to Home
+    </a>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="register-card">
+        <div class="card-header">
+            <h3><i class="bi bi-person-plus"></i> Create Your Account</h3>
+            <p class="mb-0">Join our portfolio management system</p>
+        </div>
+        <div class="card-body">
+            <form method="POST" onsubmit="return validateForm()">
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-icon">
+                        <input type="text" id="username" name="username" class="form-control form-control-lg" required>
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-icon">
+                        <input type="email" id="email" name="email" class="form-control form-control-lg" required>
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <div class="input-icon">
+                        <input type="text" id="full_name" name="full_name" class="form-control form-control-lg" required>
+                        <i class="bi bi-card-text"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-icon">
+                        <input type="password" id="password" name="password" class="form-control form-control-lg" 
+                            required onkeyup="validatePassword()">
+                        <i class="bi bi-lock"></i>
+                    </div>
+                    <div class="password-strength mt-2">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <div id="passwordError" class="error mt-2"></div>
+                    <small class="text-muted">Must be at least 8 characters with 1 special character</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                    <i class="bi bi-person-plus"></i> Register Now
+                </button>
+
+                <div class="text-center mt-3">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-primary">Login here</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function validatePassword() {
+            const password = document.getElementById("password").value;
+            const errorMsg = document.getElementById("passwordError");
+            const strengthBar = document.getElementById("passwordStrengthBar");
+            const regex = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+            
+            // Password strength calculation
+            let strength = 0;
+            if (password.length >= 8) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password)) strength += 25;
+            if (/[!@#$%^&*]/.test(password)) strength += 25;
+            
+            // Update strength bar
+            strengthBar.style.width = strength + '%';
+            if (strength < 50) {
+                strengthBar.style.backgroundColor = '#dc3545';
+            } else if (strength < 75) {
+                strengthBar.style.backgroundColor = '#fd7e14';
+            } else {
+                strengthBar.style.backgroundColor = '#28a745';
+            }
+            
+            // Validate requirements
+            if (!regex.test(password)) {
+                errorMsg.innerHTML = "Password must be at least 8 characters with 1 special character";
+                errorMsg.style.color = '#dc3545';
+                return false;
+            } else {
+                errorMsg.innerHTML = "Password strength: " + strength + '%';
+                errorMsg.style.color = strength < 50 ? '#dc3545' : strength < 75 ? '#fd7e14' : '#28a745';
+                return true;
+            }
+        }
+
+        function validateForm() {
+            return validatePassword();
+        }
+    </script>
+</body>
+</html>

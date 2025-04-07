@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Portfolio Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-blue: #0077b6;
+            --dark-blue: #005f8a;
+            --light-blue: #e6f0ff;
+        }
+        body {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f0ff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-card {
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 119, 182, 0.15);
+            overflow: hidden;
+            margin: 2rem auto;
+        }
+        .card-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .card-body {
+            padding: 2rem;
+        }
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(0, 119, 182, 0.25);
+        }
+        .btn-primary {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            padding: 0.5rem;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: var(--dark-blue);
+            border-color: var(--dark-blue);
+        }
+        .flashes {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .nav-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        .input-icon {
+            position: relative;
+        }
+        .input-icon i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-blue);
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('home') }}" class="btn btn-outline-primary nav-back">
+        <i class="bi bi-arrow-left"></i> Back to Home
+    </a>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="login-card">
+        <div class="card-header">
+            <h3><i class="bi bi-box-arrow-in-right"></i> Welcome Back</h3>
+            <p class="mb-0">Sign in to manage your portfolio</p>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-icon">
+                        <input type="text" id="username" name="username" class="form-control form-control-lg" required>
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-icon">
+                        <input type="password" id="password" name="password" class="form-control form-control-lg" required>
+                        <i class="bi bi-lock"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4 remember-me">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    <a href="#" class="text-primary">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </button>
+
+                <div class="text-center mt-3">
+                    <p class="mb-1">Don't have an account? <a href="{{ url_for('register') }}" class="text-primary">Register here</a></p>
+                    <p class="mb-0"><a href="{{ url_for('all_stocks') }}" class="text-primary">View All Stocks</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
